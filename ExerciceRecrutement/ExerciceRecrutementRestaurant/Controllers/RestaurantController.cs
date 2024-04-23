@@ -8,34 +8,30 @@ using System.Xml.Linq;
 
 namespace ExerciceRecrutementRestaurant.Controllers
 {
-    // The callable API for the loadbalancer
+    // The callable API for the restaurant model
     [ApiController]
     [Route("api/Restaurant")]
     [Produces("application/json")]
-    public class LoadBalancerController : ControllerBase
+    public class RestaurantController : ControllerBase
     {
-        private string appKey = "fv5s4<3F5vdfe5wee-s";
-
         private RestaurantService restaurantService;
 
-        public LoadBalancerController()
+        public RestaurantController()
         {
             this.restaurantService = new RestaurantService();
         }
 
+        // GET REQUEST TO RETRIEVE ALL RESTAURANTS
         [HttpGet]
         public IActionResult GetAllRestaurants()
         {
             try
             {
                 List<Restaurant> restaurants = restaurantService.GetAllRestaurants();
-
                 // The HTTP response
                 OkObjectResult response = new OkObjectResult(null);
-
                 // Return an anonymous object with only the needed properties
                 var formattedRestaurants = restaurants.Select(restaurant => new { restaurant.Id, restaurant.Name });
-
                 response = Ok(formattedRestaurants);
                 return response;
             }
@@ -45,19 +41,17 @@ namespace ExerciceRecrutementRestaurant.Controllers
             }
         }
 
+        // GET REQUEST TO RETRIEVE ALL THE MEALS FOR A SPECIFIC RESTAURANT
         [HttpGet("{id}")]
         public IActionResult GetRestaurantMeals(string id)
         {
             try
             {
                 List<Meal> meals = restaurantService.GetRestaurantMeals(id);
-
                 // The HTTP response
                 OkObjectResult response = new OkObjectResult(null);
-
                 // Return an anonymous object with only the needed properties
                 var formattedMeals = meals.Select(meal => new { meal.Id, meal.Name, meal.Image });
-
                 response = Ok(formattedMeals);
                 return response;
             }
@@ -67,45 +61,26 @@ namespace ExerciceRecrutementRestaurant.Controllers
             }
         }
 
-        
-
-        /// <summary>Make the DCS traitement on specified pdf file using specified json config.</summary>
-        /// <param name="requestPostModel">  The json request.</param>
-        /// <returns>IActionResult json response with code 200 if all went well or error code if there was a problem.</returns>
+        // POST REQUEST TO ADD A NEW MEAL TO A SPECIFIC RESTAURANT
         [HttpPost("{id}")]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Dictionary<string, object>))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
-        [ProducesResponseType(StatusCodes.Status419AuthenticationTimeout)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        //public async Task<IActionResult> Process(RequestPostModel requestPostModel) // -> If there is an async need in the method, use this instead
-        public IActionResult AddNewMealToRestaurant(string id, JObject requestBody) // -> Sync version
+        public IActionResult AddNewMealToRestaurant(string id, JObject requestBody)
         {
             try
             {
-
                 string mealToAdd = requestBody["meal"].ToString();
-
                 int success = restaurantService.AddNewMealToRestaurant(id, mealToAdd);
-
                 if (success != 0)
                 {
                     return BadRequest(new Dictionary<string, object> {
                         { "Status", "Error" },
-                        { "Message", "The provided meal is invalid" }
+                        { "Message", "The provided meal / restaurant is invalid" }
                     });
                 }
-
-                // On renvoie un message de succes pour confirmer que le resultat a ete recu correctement
                 // The HTTP response
                 OkObjectResult response = new OkObjectResult(null);
                 response = Ok(new Dictionary<string, object> {
                     { "Status", "Success" }
                 });
-
                 return response;
             }
             catch (Exception e)
@@ -114,33 +89,21 @@ namespace ExerciceRecrutementRestaurant.Controllers
             }
         }
 
+        // POST REQUEST TO ADD A NEW RESTAURANT
         [HttpPost]
-        [Produces("application/json")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(Dictionary<string, object>))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status415UnsupportedMediaType)]
-        [ProducesResponseType(StatusCodes.Status419AuthenticationTimeout)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        //public async Task<IActionResult> Process(RequestPostModel requestPostModel) // -> If there is an async need in the method, use this instead
-        public IActionResult AddNewRestaurant(JObject requestBody) // -> Sync version
+        public IActionResult AddNewRestaurant(JObject requestBody)
         {
             try
             {
                 string name = requestBody["name"].ToString();
-
                 int success = restaurantService.AddNewRestaurant(name);
-
                 if (success != 0)
                 {
                     return BadRequest(new Dictionary<string, object> {
                         { "Status", "Error" },
-                        { "Message", "The provided meal is invalid" }
+                        { "Message", "The provided restaurant is invalid" }
                     });
                 }
-
-                // On renvoie un message de succes pour confirmer que le resultat a ete recu correctement
                 // The HTTP response
                 OkObjectResult response = new OkObjectResult(null);
                 response = Ok(new Dictionary<string, object> {

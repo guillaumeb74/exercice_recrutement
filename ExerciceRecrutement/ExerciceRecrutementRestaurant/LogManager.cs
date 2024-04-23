@@ -10,7 +10,7 @@ namespace ExerciceRecrutementRestaurant
         public static void AppendLogLine(string status, string logLine)
         {
             DateTime dateTimeNow = DateTime.Now;
-            string filePath = "log/" + dateTimeNow.Year + "-" + dateTimeNow.Month + "-" + dateTimeNow.Day + "-D4E_DCS_LoadBalancer.log";
+            string filePath = "log/" + dateTimeNow.Year + "-" + dateTimeNow.Month + "-" + dateTimeNow.Day;
             Directory.CreateDirectory("log");
             File.AppendAllText(filePath, DateTime.Now.ToShortTimeString() + " [" + status + "] " + logLine + Environment.NewLine);
             Console.WriteLine(logLine);

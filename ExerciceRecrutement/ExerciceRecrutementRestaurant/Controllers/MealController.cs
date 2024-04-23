@@ -7,14 +7,12 @@ using System.ServiceProcess;
 
 namespace ExerciceRecrutementRestaurant.Controllers
 {
-    // The callable API for the loadbalancer
+    // The callable API for the meal model
     [ApiController]
     [Route("api/Meal")]
     [Produces("application/json")]
     public class MealController : ControllerBase
     {
-        private string appKey = "fv5s4<3F5vdfe5wee-s";
-
         private MealService mealService;
 
         public MealController()
@@ -22,14 +20,13 @@ namespace ExerciceRecrutementRestaurant.Controllers
             this.mealService = new MealService();
         }
 
+        // GET REQUEST TO FIND A MEAL IN THE API BY NAME
         [HttpGet("{name}")]
         public IActionResult FindMealByName(string name)
         {
             try
             {
-                //Meal meal = new Meal();
                 Meal meal = mealService.FindMealByName(name);
-
                 // The HTTP response
                 OkObjectResult response = new OkObjectResult(null);
                 response = Ok(meal);

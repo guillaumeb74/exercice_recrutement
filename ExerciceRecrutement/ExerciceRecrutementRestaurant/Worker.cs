@@ -3,8 +3,6 @@
     // The main class of the background service worker
     public class Worker : BackgroundService
     {
-        // The looping delay for each parallel task (in ms)
-        private int delayTaskSendFilesToLoadBalancer = 10000;
 
         private readonly ILogger<Worker> _logger;
 
@@ -13,7 +11,7 @@
             _logger = logger;
         }  
 
-        // Parallel task used to send all current files to dcs instances for treatment
+        // Parallel task used to keep service alive
         protected async Task TaskWaitForStopSignal(CancellationToken stoppingToken)
         {
             // If cancellation signal received, try to shutdown gracefully
@@ -21,11 +19,10 @@
             {
                 try
                 {
-                    //LoadBalancerManager.SendFilesToDcs(stoppingToken);
                     // Wait X seconds before performing loop again, but immediately stop delay if interrupt requested 
                     try
                     {
-                        await Task.Delay(delayTaskSendFilesToLoadBalancer, stoppingToken);
+                        await Task.Delay(10000, stoppingToken);
                     }
                     catch (Exception exception)
                     {
@@ -42,7 +39,6 @@
                 }
             }
             LogManager.AppendLogLine("INFO", "stopping service ...");
-            //LoadBalancerManager.CancelAllDcsFileProgress();
         }
 
         // Called when the service is launched
@@ -50,7 +46,6 @@
         {
             LogManager.AppendLogLine("INFO", "started service");
             // Looping main service and wait for it to stop if service stop requested
-
             try
             {
                 // Create a linked cancellation token source to be able to manually stop all service tasks
@@ -60,7 +55,6 @@
                 // Create a list of tasks
                 var tasks = new List<Task>
                 {
-                    //Task.Run(() => TaskTodo(linkedTokenSource.Token).GetAwaiter().GetResult()),
                     Task.Run(() => TaskWaitForStopSignal(linkedTokenSource.Token).GetAwaiter().GetResult())
                 };
                 await Task.WhenAny(tasks);

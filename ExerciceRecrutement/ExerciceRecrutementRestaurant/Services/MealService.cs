@@ -16,15 +16,6 @@ namespace ExerciceRecrutementRestaurant.Services
 
         public MealService() { }
 
-        /*public Meal GetMeal(string mealId)
-        {
-
-            Meal meal = this.meals.Find(elem => elem.Id.Equals(mealId));
-
-            return meal;
-
-        }*/
-
         // Find a meal in Meal DB API matching name
         public Meal FindMealByName(string name)
         {
@@ -65,6 +56,7 @@ namespace ExerciceRecrutementRestaurant.Services
             }
         }
 
+        // Add a new meal in DB
         public void AddMeal(Meal meal)
         {
             using (var db = new RestaurantsContext())

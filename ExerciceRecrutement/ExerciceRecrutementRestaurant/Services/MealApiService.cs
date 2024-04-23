@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace ExerciceRecrutementRestaurant.Services
 {
+    // Class used to call the MEAL DB API to retrieve some meal data
     public class MealApiService
     {
         public MealApiService() { }
@@ -19,7 +20,7 @@ namespace ExerciceRecrutementRestaurant.Services
             {
                 ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
             };
-            // Create httpclient and add the access token in cookie
+            // Create httpclient
             HttpClient client = new HttpClient(handler);
 
             string url = "https://www.themealdb.com/api/json/v1/1/search.php?s=" + name;
