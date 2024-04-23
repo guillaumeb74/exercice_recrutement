@@ -1,4 +1,6 @@
 ﻿using ExerciceRecrutementRestaurant.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,37 +11,17 @@ namespace ExerciceRecrutementRestaurant.Services
 {
     public class RestaurantService
     {
-
-        private List<Restaurant> restaurants = new List<Restaurant>()
-        {
-            new Restaurant()
-            {
-                Id = "0",
-                Name = "Restaurant1",
-                Meals = new List<string>()
-                {
-                    "0",
-                    "1"
-                }
-            },
-            new Restaurant()
-            {
-                Id = "1",
-                Name = "Restaurant2",
-                Meals = new List<string>()
-                {
-                    "2",
-                    "3"
-                }
-            }
-        };
-
         public RestaurantService() { }
 
         public List<Restaurant> GetAllRestaurants()
         {
+            List<Restaurant> restaurants;
+            using (var db = new RestaurantsContext())
+            {
 
-            List<Restaurant> restaurants = this.restaurants;
+                restaurants = db.Restaurants.ToList();
+
+            }
 
             return restaurants;
 
@@ -47,18 +29,23 @@ namespace ExerciceRecrutementRestaurant.Services
 
         public List<Meal> GetRestaurantMeals(string restaurantId)
         {
-            MealService mealService = new MealService();
-
-            List<Meal> meals = new List<Meal>();
-
-            Restaurant restaurant = this.restaurants.Find(elem => elem.Id.Equals(restaurantId));
-            foreach (string mealId in restaurant.Meals)
+            Restaurant restaurant;
+            using (var db = new RestaurantsContext())
             {
-                meals.Add(mealService.GetMeal(mealId));
+                restaurant = db.Restaurants.Include(r => r.Meals).ToList().Find(elem => elem.Id.Equals(restaurantId));
             }
 
-            return meals;
+            if (restaurant == null)
+            {
+                return new List<Meal>();
+            }
 
+            List<Meal> meals = new List<Meal>();
+            foreach (Meal meal in restaurant.Meals)
+            {
+                meals.Add(meal);
+            }
+            return meals;
         }
 
         public int AddNewMealToRestaurant(string restaurantId, string mealName)
@@ -71,10 +58,44 @@ namespace ExerciceRecrutementRestaurant.Services
                 return -1;
             }
 
-            mealService.AddMeal(meal);
+            try
+            {
+                mealService.AddMeal(meal);
+            }
+            catch (Exception exception)
+            {
+                // The meal already exists in DB, but that's ok
+            }
 
-            Restaurant restaurant = this.restaurants.Find(elem => elem.Id.Equals(restaurantId));
-            restaurant.Meals.Add(meal.Id);
+            using (var db = new RestaurantsContext())
+            {
+                Restaurant restaurant = db.Restaurants.Include(r => r.Meals).ToList().Find(elem => elem.Id.Equals(restaurantId));
+
+                Meal meal1 = db.Meals.FirstOrDefault(elem => elem.Id.Equals(meal.Id));
+
+                restaurant.Meals.Add(meal1);
+
+                db.Restaurants.Update(restaurant);
+                db.SaveChanges();
+            }
+
+            return 0;
+
+        }
+
+        public int AddNewRestaurant(string name)
+        {
+            Restaurant restaurant = new Restaurant() {
+                Id = System.Guid.NewGuid().ToString(),
+                Name = name,
+                Meals = new List<Meal>()
+            };
+
+            using (var db = new RestaurantsContext())
+            {
+                db.Restaurants.Add(restaurant);
+                db.SaveChanges();
+            }
 
             return 0;
 

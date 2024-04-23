@@ -1,17 +1,18 @@
-﻿
-namespace ExerciceRecrutementRestaurant.Models
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.Serialization;
+
+namespace ExerciceRecrutementRestaurant.Models;
+
+public partial class Meal
 {
-    public class Meal
-    {
+    public string Id { get; set; } = null!;
 
-        public string Id { get; set; }
+    public string? Name { get; set; }
 
-        public string Name { get; set; }
+    public string? Image { get; set; }
 
-        // Image url
-        public string Image { get; set; }
+    //[IgnoreDataMemberAttribute]
+    public virtual ICollection<Restaurant> Restaurants { get; set; }
 
-        public Meal() { }
-
-    }
 }

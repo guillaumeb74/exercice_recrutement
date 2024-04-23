@@ -17,6 +17,7 @@ builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation()
     .AddNewtonsoftJson(options =>
     {
+        //options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
         // Used to specify a default custom json serializer converter - instead we just use JObject then use custom serialization after
         //options.SerializerSettings.Converters.Add(new RequestPostModelConverter()); 
     });

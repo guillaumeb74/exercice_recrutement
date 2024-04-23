@@ -14,40 +14,16 @@ namespace ExerciceRecrutementRestaurant.Services
     public class MealService
     {
 
-        private List<Meal> meals = new List<Meal>()
-        {
-            new Meal()
-            {
-                Id = "0",
-                Name = "meal1",
-            },
-            new Meal()
-            {
-                Id = "1",
-                Name = "meal2",
-            },
-            new Meal()
-            {
-                Id = "2",
-                Name = "meal3",
-            },
-            new Meal()
-            {
-                Id = "3",
-                Name = "meal4",
-            }
-        };
-
         public MealService() { }
 
-        public Meal GetMeal(string mealId)
+        /*public Meal GetMeal(string mealId)
         {
 
             Meal meal = this.meals.Find(elem => elem.Id.Equals(mealId));
 
             return meal;
 
-        }
+        }*/
 
         // Find a meal in Meal DB API matching name
         public Meal FindMealByName(string name)
@@ -91,7 +67,11 @@ namespace ExerciceRecrutementRestaurant.Services
 
         public void AddMeal(Meal meal)
         {
-            this.meals.Add(meal);
+            using (var db = new RestaurantsContext())
+            {
+                db.Meals.Add(meal);
+                db.SaveChanges();
+            }
         }
 
     }
